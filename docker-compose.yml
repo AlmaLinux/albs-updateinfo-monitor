@@ -1,0 +1,31 @@
+version: "3.9"
+services:
+  db:
+    image: postgres:13
+    env_file:
+      - vars.env
+    environment:
+      - POSTGRES_INITDB_ARGS=--auth-host=scram-sha-256 --encoding=UTF8 --locale=en_US.UTF-8 --data-checksums
+      - POSTGRES_HOST_AUTH_METHOD=scram-sha-256
+    ports:
+      - "5432:5432"
+    volumes:
+      - "./volumes/postgresql/data:/var/lib/postgresql/data"
+  updateinfo-monitor:
+    image: albs-updateinfo-monitor
+    env_file:
+      - vars.env
+    ports:
+      - "8088:8000"
+    build:
+      dockerfile: Dockerfile
+      context: .
+    volumes:
+      - "./updateinfo_monitor/:/code/updateinfo_monitor"
+      - "./volumes/repodata_cache_dir:/srv/repodata_cache_dir"
+    command:
+      bash -c '/wait_for_it.sh db:5432 &&
+               poetry run alembic --config updateinfo_monitor/alembic.ini upgrade head &&
+               poetry run python ./updateinfo_monitor/cli.py'
+    depends_on:
+      - db

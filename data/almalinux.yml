@@ -1,0 +1,345 @@
+---
+- name: AlmaLinux-8
+  version: '8'
+  arches:
+    - i686
+    - x86_64
+    - ppc64le
+    - aarch64
+    - s390x
+  repositories:
+    - name: almalinux-8-baseos
+      description: AlmaLinux 8 - BaseOS
+      url: https://repo.almalinux.org/almalinux/8/BaseOS/$basearch/os/
+    - name: almalinux-8-baseos-debuginfo
+      description: AlmaLinux 8 - BaseOS debuginfo
+      debuginfo: true
+      url: https://repo.almalinux.org/vault/8/BaseOS/debug/$basearch/
+    - name: almalinux-8-appstream
+      description: AlmaLinux 8 - AppStream
+      url: https://repo.almalinux.org/almalinux/8/AppStream/$basearch/os/
+    - name: almalinux-8-appstream-debuginfo
+      description: AlmaLinux 8 - AppStream debuginfo
+      debuginfo: true
+      url: https://repo.almalinux.org/vault/8/AppStream/debug/$basearch/
+    - name: almalinux-8-powertools
+      description: AlmaLinux 8 - PowerTools
+      url: https://repo.almalinux.org/almalinux/8/PowerTools/$basearch/os/
+    - name: almalinux-8-powertools-debuginfo
+      description: AlmaLinux 8 - PowerTools debuginfo
+      debuginfo: true
+      url: https://repo.almalinux.org/vault/8/PowerTools/debug/$basearch/
+    - name: almalinux-8-highavailability
+      description: AlmaLinux 8 - HighAvailability
+      url: https://repo.almalinux.org/almalinux/8/HighAvailability/$basearch/os/
+    - name: almalinux-8-highavailability-debuginfo
+      description: AlmaLinux 8 - HighAvailability debuginfo
+      debuginfo: true
+      url: https://repo.almalinux.org/vault/8/HighAvailability/debug/$basearch/
+    - name: almalinux-8-resilientstorage
+      description: AlmaLinux 8 - ResilientStorage
+      url: https://repo.almalinux.org/almalinux/8/ResilientStorage/$basearch/os/
+    - name: almalinux-8-resilientstorage-debuginfo
+      description: AlmaLinux 8 - ResilientStorage debuginfo
+      debuginfo: true
+      url: https://repo.almalinux.org/vault/8/ResilientStorage/debug/$basearch/
+    - name: almalinux-8-rt
+      description: AlmaLinux 8 - RT
+      url: http://repo.almalinux.org/almalinux/8/RT/$basearch/os/
+      exclude_arch:
+        - aarch64
+        - ppc64le
+        - s390x
+    - name: almalinux-8-rt-debuginfo
+      description: AlmaLinux 8 - RT debuginfo
+      debuginfo: true
+      url: http://repo.almalinux.org/vault/8/RT/debug/$basearch/
+      exclude_arch:
+        - aarch64
+        - ppc64le
+    - name: almalinux-8-nfv
+      description: AlmaLinux 8 - NFV
+      url: http://repo.almalinux.org/almalinux/8/NFV/$basearch/os/
+      exclude_arch:
+        - aarch64
+        - ppc64le
+        - s390x
+        - i686
+    - name: almalinux-8-nfv-debuginfo
+      description: AlmaLinux 8 - NFV debuginfo
+      debuginfo: true
+      url: http://repo.almalinux.org/vault/8/NFV/debug/$basearch/
+      exclude_arch:
+        - aarch64
+        - ppc64le
+        - s390x
+    - name: almalinux-8-plus
+      description: AlmaLinux 8 - plus
+      url: http://repo.almalinux.org/almalinux/8/plus/$basearch/os/
+    - name: almalinux-8-plus-debuginfo
+      description: AlmaLinux 8 - plus debuginfo
+      debuginfo: true
+      url: http://repo.almalinux.org/vault/8/plus/debug/$basearch/
+    - name: almalinux-8-devel
+      description: AlmaLinux 8 - Devel
+      url: http://repo.almalinux.org/almalinux/8/devel/$basearch/os/
+    - name: almalinux-8-devel-debuginfo
+      description: AlmaLinux 8 - Devel debuginfo
+      debuginfo: true
+      url: http://repo.almalinux.org/vault/8/devel/debug/$basearch/
+    - name: almalinux-8-plus
+      description: AlmaLinux 8 - plus
+      url: http://repo.almalinux.org/vault/8/plus/i686/os/
+    - name: almalinux-8-plus-debuginfo
+      description: AlmaLinux 8 - plus debuginfo
+      debuginfo: true
+      url: http://repo.almalinux.org/vault/8/plus/debug/i686/
+    - name: almalinux-8-raspberrypi
+      description: AlmaLinux 8 - raspberrypi
+      url: http://repo.almalinux.org/almalinux/8/raspberrypi/$basearch/os/
+      exclude_arch:
+        - x86_64
+        - ppc64le
+        - s390x
+    - name: almalinux-8-raspberrypi-debuginfo
+      description: AlmaLinux 8 - raspberrypi debuginfo
+      debuginfo: true
+      url: http://repo.almalinux.org/almalinux/8/raspberrypi/debug/$basearch/
+      exclude_arch:
+        - x86_64
+        - ppc64le
+        - s390x
+  sources:
+    - name: almalinux-8-baseos
+      description: AlmaLinux 8 - BaseOS Source
+      url: https://repo.almalinux.org/vault/8/BaseOS/Source/
+    - name: almalinux-8-appstream
+      description: AlmaLinux 8 - AppStream Source
+      url: https://repo.almalinux.org/vault/8/AppStream/Source/
+    - name: almalinux-8-powertools
+      description: AlmaLinux 8 - PowerTools Source
+      url: https://repo.almalinux.org/vault/8/PowerTools/Source/
+    - name: almalinux-8-highavailability
+      description: AlmaLinux 8 - HighAvailability Source
+      url: https://repo.almalinux.org/vault/8/HighAvailability/Source/
+    - name: almalinux-8-resilientstorage
+      description: AlmaLinux 8 - ResilientStorage Source
+      url: https://repo.almalinux.org/vault/8/ResilientStorage/Source/
+    - name: almalinux-8-plus
+      description: AlmaLinux 8 - plus Source
+      url: http://repo.almalinux.org/vault/8/plus/Source/
+    - name: almalinux-8-raspberrypi
+      description: AlmaLinux 8 - raspberrypi Source
+      url: http://repo.almalinux.org/almalinux/8/raspberrypi/Source/
+    - name: almalinux-8-rt
+      description: AlmaLinux 8 - RT Source
+      url: http://repo.almalinux.org/vault/8/RT/Source/
+    - name: almalinux-8-nfv
+      description: AlmaLinux 8 - NFV Source
+      url: http://repo.almalinux.org/vault/8/NFV/Source/
+    - name: almalinux-8-devel
+      description: AlmaLinux 8 - Devel Source
+      url: http://repo.almalinux.org/vault/8/devel/Source/
+
+- name: AlmaLinux-9
+  version: '9'
+  arches:
+    - i686
+    - x86_64
+    - ppc64le
+    - aarch64
+    - s390x
+  repositories:
+    - name: almalinux-9-appstream
+      description: AlmaLinux 9 - AppStream
+      url: http://rsync.repo.almalinux.org/almalinux/9/AppStream/$basearch/os/
+      url_type: baseurl
+    - name: almalinux-9-appstream-debuginfo
+      description: AlmaLinux 9 - AppStream debuginfo
+      debuginfo: true
+      url: http://rsync.repo.almalinux.org/vault/9/AppStream/debug/$basearch/
+      url_type: baseurl
+    - name: almalinux-9-baseos
+      description: AlmaLinux 9 - BaseOS
+      url: http://rsync.repo.almalinux.org/almalinux/9/BaseOS/$basearch/os/
+      url_type: baseurl
+    - name: almalinux-9-baseos-debuginfo
+      description: AlmaLinux 9 - BaseOS debuginfo
+      debuginfo: true
+      url: http://rsync.repo.almalinux.org/vault/9/BaseOS/debug/$basearch/
+      url_type: baseurl
+    - name: almalinux-9-crb
+      description: AlmaLinux 9 - CRB
+      url: http://rsync.repo.almalinux.org/almalinux/9/CRB/$basearch/os/
+      url_type: baseurl
+    - name: almalinux-9-crb-debuginfo
+      description: AlmaLinux 9 - CRB debuginfo
+      debuginfo: true
+      url: http://rsync.repo.almalinux.org/vault/9/CRB/debug/$basearch/
+      url_type: baseurl
+    - name: almalinux-9-highavailability
+      description: AlmaLinux 9 - HighAvailability
+      url: http://rsync.repo.almalinux.org/almalinux/9/HighAvailability/$basearch/os/
+      url_type: baseurl
+    - name: almalinux-9-highavailability-debuginfo
+      description: AlmaLinux 9 - HighAvailability debuginfo
+      debuginfo: true
+      url: http://rsync.repo.almalinux.org/vault/9/HighAvailability/debug/$basearch/
+      url_type: baseurl
+    - name: almalinux-9-nfv
+      description: AlmaLinux 9 - NFV
+      url: http://rsync.repo.almalinux.org/almalinux/9/NFV/$basearch/os/
+      url_type: baseurl
+      exclude_arch:
+        - ppc64le
+        - s390x
+        - aarch64
+    - name: almalinux-9-raspberrypi
+      description: AlmaLinux 9 - raspberrypi
+      url: http://rsync.repo.almalinux.org/almalinux/9/raspberrypi/$basearch/os/
+      url_type: baseurl
+      exclude_arch:
+        - x86_64
+        - ppc64le
+        - s390x
+    - name: almalinux-9-raspberrypi-debuginfo
+      description: AlmaLinux 9 - raspberrypi debuginfo
+      debuginfo: true
+      url: http://rsync.repo.almalinux.org/vault/9/raspberrypi/debug/$basearch/
+      url_type: baseurl
+      exclude_arch:
+        - x86_64
+        - ppc64le
+        - s390x
+    - name: almalinux-9-nfv-debuginfo
+      description: AlmaLinux 9 - NFV debuginfo
+      debuginfo: true
+      url: http://rsync.repo.almalinux.org/vault/9/NFV/debug/$basearch/
+      url_type: baseurl
+      exclude_arch:
+        - ppc64le
+        - s390x
+        - aarch64
+    - name: almalinux-9-rt
+      description: AlmaLinux 9 - RT
+      url: http://rsync.repo.almalinux.org/almalinux/9/RT/$basearch/os/
+      url_type: baseurl
+      exclude_arch:
+        - ppc64le
+        - s390x
+        - aarch64
+    - name: almalinux-9-rt-debuginfo
+      description: AlmaLinux 9 - RT debuginfo
+      debuginfo: true
+      url: http://rsync.repo.almalinux.org/vault/9/RT/debug/$basearch/
+      url_type: baseurl
+      exclude_arch:
+        - ppc64le
+        - s390x
+        - aarch64
+    - name: almalinux-9-resilientstorage
+      description: AlmaLinux 9 - ResilientStorage
+      url: http://rsync.repo.almalinux.org/almalinux/9/ResilientStorage/$basearch/os/
+      url_type: baseurl
+    - name: almalinux-9-resilientstorage-debuginfo
+      description: AlmaLinux 9 - ResilientStorage debuginfo
+      debuginfo: true
+      url: http://rsync.repo.almalinux.org/vault/9/ResilientStorage/debug/$basearch/
+      url_type: baseurl
+    - name: almalinux-9-extras
+      description: AlmaLinux 9 - Extras
+      url: http://rsync.repo.almalinux.org/almalinux/9/extras/$basearch/os/
+      url_type: baseurl
+    - name: almalinux-9-extras-debuginfo
+      description: AlmaLinux 9 - Extras debuginfo
+      debuginfo: true
+      url: http://rsync.repo.almalinux.org/vault/9/extras/debug/$basearch/
+      url_type: baseurl
+    - name: almalinux-9-sap
+      description: AlmaLinux 9 - SAP
+      url: http://rsync.repo.almalinux.org/almalinux/9/SAP/$basearch/os/
+      url_type: baseurl
+    - name: almalinux-9-sap-debuginfo
+      description: AlmaLinux 9 - SAP debuginfo
+      debuginfo: true
+      url: http://rsync.repo.almalinux.org/vault/9/SAP/debug/$basearch/
+      url_type: baseurl
+    - name: almalinux-9-saphana
+      description: AlmaLinux 9 - SAPHANA
+      url: http://rsync.repo.almalinux.org/almalinux/9/SAPHANA/$basearch/os/
+      url_type: baseurl
+    - name: almalinux-9-saphana-debuginfo
+      description: AlmaLinux 9 - SAPHANA debuginfo
+      debuginfo: true
+      url: http://rsync.repo.almalinux.org/vault/9/SAPHANA/debug/$basearch/
+      url_type: baseurl
+    - name: almalinux-9-plus
+      description: AlmaLinux 9 - plus
+      url: http://rsync.repo.almalinux.org/almalinux/9/plus/$basearch/os/
+      url_type: baseurl
+    - name: almalinux-9-plus-debuginfo
+      description: AlmaLinux 9 - plus debuginfo
+      url: http://rsync.repo.almalinux.org/vault/9/plus/debug/$basearch/
+      url_type: baseurl
+    - name: almalinux-9-devel
+      description: AlmaLinux 9 - Devel
+      url: http://rsync.repo.almalinux.org/almalinux/9/devel/$basearch/os/
+      url_type: baseurl
+    - name: almalinux-9-devel-debuginfo
+      description: AlmaLinux 9 - Devel debuginfo
+      debuginfo: true
+      url: http://rsync.repo.almalinux.org/vault/9/devel/debug/$basearch/
+      url_type: baseurl
+  sources:
+    - name: almalinux-9-appstream
+      description: AlmaLinux 9 - AppStream Source
+      url: http://rsync.repo.almalinux.org/vault/9/AppStream/Source/
+      url_type: baseurl
+    - name: almalinux-9-baseos
+      description: AlmaLinux 9 - BaseOS Source
+      url: http://rsync.repo.almalinux.org/vault/9/BaseOS/Source/
+      url_type: baseurl
+    - name: almalinux-9-crb
+      description: AlmaLinux 9 - CRB Source
+      url: http://rsync.repo.almalinux.org/vault/9/CRB/Source/
+      url_type: baseurl
+    - name: almalinux-9-highavailability
+      description: AlmaLinux 9 - HighAvailability Source
+      url: http://rsync.repo.almalinux.org/vault/9/HighAvailability/Source/
+      url_type: baseurl
+    - name: almalinux-9-nfv
+      description: AlmaLinux 9 - NFV Source
+      url: http://rsync.repo.almalinux.org/vault/9/NFV/Source/
+      url_type: baseurl
+    - name: almalinux-9-rt
+      description: AlmaLinux 9 - RT Source
+      url: http://rsync.repo.almalinux.org/vault/9/RT/Source/
+      url_type: baseurl
+    - name: almalinux-9-resilientstorage
+      description: AlmaLinux 9 - ResilientStorage Source
+      url: http://rsync.repo.almalinux.org/vault/9/ResilientStorage/Source/
+      url_type: baseurl
+    - name: almalinux-9-extras
+      description: AlmaLinux 9 - Extras Source
+      url: http://rsync.repo.almalinux.org/vault/9/extras/Source/
+      url_type: baseurl
+    - name: almalinux-9-sap
+      description: AlmaLinux 9 - SAP Source
+      url: http://rsync.repo.almalinux.org/vault/9/SAP/Source/
+      url_type: baseurl
+    - name: almalinux-9-saphana
+      description: AlmaLinux 9 - SAPHANA Source
+      url: http://rsync.repo.almalinux.org/vault/9/SAPHANA/Source/
+      url_type: baseurl
+    - name: almalinux-9-plus
+      description: AlmaLinux 9 - plus
+      url: http://rsync.repo.almalinux.org/vault/9/plus/Source/
+      url_type: baseurl
+    - name: almalinux-9-raspberrypi
+      description: AlmaLinux 9 - raspberrypi
+      url: http://rsync.repo.almalinux.org/vault/9/raspberrypi/Source/
+      url_type: baseurl
+    - name: almalinux-9-devel
+      description: AlmaLinux 9 - Devel
+      url: http://rsync.repo.almalinux.org/vault/9/devel/Source/
+      url_type: baseurl
