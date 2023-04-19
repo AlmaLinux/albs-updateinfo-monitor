@@ -27,7 +27,6 @@ def start_monitoring_loop():
             repo.last_error = format_exc()
         finally:
             update_repo_values(repo)
-        time.sleep(10)
 
 
 if __name__ == "__main__":

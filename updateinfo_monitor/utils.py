@@ -39,7 +39,8 @@ def get_repo_to_index() -> Repository | None:
         minutes=settings.index_interval,
     )
     query = select(models.Repository).where(
-        Repository.check_ts.is_(None) | (Repository.check_ts < delta),
+        models.Repository.check_ts.is_(None)
+        | (models.Repository.check_ts < delta),
     )
     with get_session() as session:
         db_repo = session.execute(query).scalars().first()

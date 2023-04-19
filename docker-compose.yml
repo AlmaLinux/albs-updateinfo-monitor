@@ -21,11 +21,13 @@ services:
       dockerfile: Dockerfile
       context: .
     volumes:
+      - "./data/:/code/data/"
+      - "./alembic/:/code/alembic/"
       - "./updateinfo_monitor/:/code/updateinfo_monitor"
       - "./volumes/repodata_cache_dir:/srv/repodata_cache_dir"
     command:
       bash -c '/wait_for_it.sh db:5432 &&
-               poetry run alembic --config updateinfo_monitor/alembic.ini upgrade head &&
+               poetry run alembic upgrade head &&
                poetry run python ./updateinfo_monitor/cli.py'
     depends_on:
       - db
