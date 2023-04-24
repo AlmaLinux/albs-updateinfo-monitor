@@ -14,7 +14,6 @@ class Repository(BaseModel):
     id: int | None = None
     name: str
     arch: str = ""
-    description: str = ""
     url: AnyHttpUrl
     exclude_arch: list[str] = Field(default_factory=list)
     debuginfo: bool = False
@@ -24,6 +23,7 @@ class Repository(BaseModel):
     last_error: str | None = None
     check_result: dict | None = Field(default_factory=dict)
     check_result_checksum: str | None = None
+    old_repositories: list["Repository"] = Field(default_factory=list)
 
     class Config:
         orm_mode = True
@@ -47,6 +47,7 @@ class Distribution(BaseModel):
     arches: list[str]
     repositories: list[Repository]
     sources: list[Repository]
+    old_versions: list[str]
 
 
 class RepomdRecord(BaseModel):
@@ -59,7 +60,7 @@ class RepomdRecord(BaseModel):
     location_href: str
     size: int
     size_open: int
-    path: Path | None = None
+    path: Path
 
 
 class Package(BaseModel):

@@ -1,12 +1,42 @@
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, String, Text
+from sqlalchemy import (
+    Boolean,
+    Column,
+    DateTime,
+    ForeignKey,
+    String,
+    Table,
+    Text,
+)
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
 class Base(DeclarativeBase):
     pass
+
+
+OldRepositories = Table(
+    "old_repositories_mapping",
+    Base.metadata,
+    Column(
+        "repository_id",
+        ForeignKey(
+            "repositories.id",
+            name="old_repositories_mapping_repository_id_fkey",
+        ),
+        primary_key=True,
+    ),
+    Column(
+        "old_repository_id",
+        ForeignKey(
+            "repositories.id",
+            name="old_repositories_mapping_old_repository_id_fkey",
+        ),
+        primary_key=True,
+    ),
+)
 
 
 class Repository(Base):
@@ -23,8 +53,15 @@ class Repository(Base):
     last_error: Mapped[str] = mapped_column(Text, nullable=True)
     check_result: Mapped[dict] = mapped_column(JSONB, nullable=True)
     check_result_checksum: Mapped[str] = mapped_column(Text, nullable=True)
+    is_old: Mapped[bool] = mapped_column(Boolean, default=False)
     updateinfo: Mapped[list["UpdateRecord"]] = relationship(
         back_populates="repository",
+    )
+    old_repositories: Mapped[list["Repository"]] = relationship(
+        "Repository",
+        secondary=OldRepositories,
+        primaryjoin=(OldRepositories.c.repository_id == id),
+        secondaryjoin=(OldRepositories.c.old_repository_id == id),
     )
 
     @property

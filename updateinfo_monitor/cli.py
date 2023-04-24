@@ -22,14 +22,8 @@ def parse_args():
         default=False,
     )
     parser.add_argument(
-        "--load",
-        action="store_true",
-        help="Loads repositories from file",
-        required=False,
-    )
-    parser.add_argument(
         "--file",
-        help="Path to .yml file with repositories",
+        help="Path to .yml file with repositories for load in DB",
         required=False,
         type=Path,
         default=Path("/srv/example.yml"),
@@ -40,7 +34,7 @@ def parse_args():
 def main():
     args = parse_args()
     configure_logger()
-    if args.load and args.file:
+    if args.file:
         load_repositories_from_file(args.file)
         return
     start_monitoring_loop()

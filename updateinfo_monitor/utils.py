@@ -13,6 +13,7 @@ import yaml
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 from sqlalchemy import select, update
+from sqlalchemy.orm import joinedload
 
 from updateinfo_monitor import models
 from updateinfo_monitor.config import settings
@@ -40,6 +41,7 @@ def get_repo_to_index() -> Repository | None:
         minutes=settings.index_interval,
     )
     query = select(models.Repository).where(
+        models.Repository.is_old.is_(False),
         models.Repository.check_ts.is_(None)
         | (models.Repository.check_ts < delta),
     )
@@ -121,7 +123,10 @@ def cleanup_repodata_dir(repodata_path: Path):
         path.rmdir()
 
 
-def iter_repodata_records(repomd_path: Path) -> Iterator[RepomdRecord]:
+def iter_repodata_records(
+    repomd_path: Path,
+    repodata_path: Path,
+) -> Iterator[RepomdRecord]:
     repomd = createrepo_c.Repomd(str(repomd_path))
     for rec in repomd.records:
         yield RepomdRecord(
@@ -135,6 +140,7 @@ def iter_repodata_records(repomd_path: Path) -> Iterator[RepomdRecord]:
                 "size_open": rec.size_open,
                 "size": rec.size,
                 "data_type": rec.type,
+                "path": Path(repodata_path, Path(rec.location_href).name),
             }
         )
 
@@ -164,6 +170,8 @@ def update_repodata_cache(repo: Repository) -> RepodataCacheResult:
             "%s repomd.xml ETag is not changed, skipping repodata update",
             repo.full_name,
         )
+        for rec in iter_repodata_records(repomd_path, repodata_path):
+            cache_result.add_repomd_record(rec)
         return cache_result
     cache_result.repomd_checksum = get_file_checksum(repomd_path)
     if cache_result.repomd_checksum == repo.repomd_checksum:
@@ -171,17 +179,16 @@ def update_repodata_cache(repo: Repository) -> RepodataCacheResult:
             "%s repomd.xml checksum is not changed, skipping repodata update",
             repo.full_name,
         )
+        for rec in iter_repodata_records(repomd_path, repodata_path):
+            cache_result.add_repomd_record(rec)
         return cache_result
     cleanup_repodata_dir(repodata_path)
-    for rec in iter_repodata_records(repomd_path):
-        file_name = Path(rec.location_href).name
+    for rec in iter_repodata_records(repomd_path, repodata_path):
         src_url = urllib.parse.urljoin(repo.url, rec.location_href)
-        dst_path = Path(repodata_path, file_name)
-        download_file_if_changed(src_url, dst_path)
-        rec_checksum = get_file_checksum(dst_path, rec.checksum_type)
+        download_file_if_changed(src_url, rec.path)
+        rec_checksum = get_file_checksum(rec.path, rec.checksum_type)
         if rec_checksum != rec.checksum:
             raise ValueError(f"{src_url} download failed: wrong checksum")
-        rec.path = dst_path
         cache_result.add_repomd_record(rec)
     cache_result.changed = True
     return cache_result
@@ -296,10 +303,23 @@ def index_repo(repo: Repository):
         return
     updateinfo_record = cache_result.get_repomd_record("updateinfo")
     if not updateinfo_record:
-        raise ValueError("Cannot parse updatinfo, repomd record is missing")
+        raise ValueError("Cannot parse updatinfo, updateinfo.xml is missing")
     updateinfo = updateinfo_from_file(updateinfo_record.path)
     repo_packages = cache_result.parse_packages()
     repo_modules = cache_result.parse_modules()
+    for old_repo in repo.old_repositories:
+        try:
+            old_repo_cache_result = update_repodata_cache(old_repo)
+            repo_packages.update(old_repo_cache_result.parse_packages())
+            repo_modules.update(old_repo_cache_result.parse_modules())
+        except Exception:
+            logging.exception(
+                "(%s) Cannot parse old repodata:",
+                old_repo.full_name,
+            )
+            continue
+        old_repo.repomd_checksum = old_repo_cache_result.repomd_checksum
+        update_repo_values(old_repo)
     check_repo_updateinfo(
         repo=repo,
         updateinfo=updateinfo,
@@ -318,7 +338,7 @@ def init_slack_client() -> WebClient:
 def send_notification(repo: Repository, slack_client: WebClient):
     if not repo.check_result or not settings.slack_notifications_enabled:
         logging.debug(
-            "Skip sending notification, check_result field is empty"
+            "Skip sending notification, check_result field is empty "
             "or sending notifications is disabled",
         )
         return
@@ -346,21 +366,54 @@ def send_notification(repo: Repository, slack_client: WebClient):
 
 
 def load_repositories_from_file(filepath: Path):
-    def process_repo():
+    def process_repo() -> models.Repository:
         repo_url = repo.url.replace("$basearch", repo.arch)
         if repo.arch == "i686":
             repo_url = repo_url.replace("/almalinux/", "/vault/")
-        db_repo = repos_mapping.get(repo.full_name)
-        if db_repo:
-            db_repo.url = repo_url
-            db_repo.debuginfo = repo.debuginfo
-            repos_to_add.append(db_repo)
-            return
-        repo_dict = repo.dict_for_create()
-        repo_dict["url"] = repo_url
-        repos_to_add.append(
-            models.Repository(**repo_dict),
+        repo_obj = repos_mapping.get(repo.full_name)
+        if not repo_obj:
+            repo_obj = models.Repository(**repo.dict_for_create())
+        for attr, value in (
+            ("url", repo_url),
+            ("debuginfo", repo.debuginfo),
+        ):
+            setattr(repo_obj, attr, value)
+        repos_to_add.append(repo_obj)
+        return repo_obj
+
+    def process_old_repo():
+        repo_name = repo_obj.name.replace(
+            f"-{distr.version}-",
+            f"-{old_version}-",
         )
+        repo_url = repo_obj.url.replace("/almalinux/", "/vault/").replace(
+            f"/{distr.version}/",
+            f"/{old_version}/",
+        )
+        old_repo_obj = next(
+            (
+                old_repo
+                for old_repo in repo_obj.old_repositories
+                if old_repo.name == repo_name
+                and old_repo.arch == repo_obj.arch
+            ),
+            None,
+        )
+        if not old_repo_obj:
+            old_repo_obj = models.Repository(
+                name=repo_name,
+                arch=repo_obj.arch,
+                url=repo_url,
+                debuginfo=repo_obj.debuginfo,
+                is_old=True,
+            )
+        for attr, value in (
+            ("url", repo_url),
+            ("debuginfo", repo.debuginfo),
+        ):
+            setattr(old_repo_obj, attr, value)
+        repo_obj.old_repositories.append(old_repo_obj)
+        repos_to_add.append(old_repo_obj)
 
     repos_to_add = []
     with open(filepath, "rb") as fd:
@@ -368,7 +421,13 @@ def load_repositories_from_file(filepath: Path):
         repos_mapping = {}
         with get_session() as session:
             db_repos = (
-                session.execute(select(models.Repository)).scalars().all()
+                session.execute(
+                    select(models.Repository).options(
+                        joinedload(models.Repository.old_repositories),
+                    )
+                )
+                .scalars()
+                .all()
             )
             repos_mapping.update({repo.full_name: repo for repo in db_repos})
             for distr in data:
@@ -382,9 +441,13 @@ def load_repositories_from_file(filepath: Path):
                         if arch in repo.exclude_arch:
                             continue
                         repo.arch = arch
-                        process_repo()
+                        repo_obj = process_repo()
+                        for old_version in distr.old_versions:
+                            process_old_repo()
                 for repo in distr.sources:
                     repo.arch = "src"
-                    process_repo()
+                    repo_obj = process_repo()
+                    for old_version in distr.old_versions:
+                        process_old_repo()
             session.add_all(repos_to_add)
             session.commit()

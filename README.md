@@ -17,6 +17,6 @@ Pre-requisites:
 
 To start the service, run the following command: `docker-compose up -d`.
 
-To rebuild images after your local changes, just run: `docker-compose restart updateinfo-monitor`
+To restart container after your local changes, run the following command: `docker-compose restart updateinfo-monitor`
 
-To load the reference data, run the following command: `docker-compose run --rm updateinfo-monitor bash -c 'poetry run python updateinfo_monitor/cli.py --load --file data/almalinux.yml'`
+To load the reference data, run the following command: `docker-compose run --rm updateinfo-monitor bash -c 'poetry run python updateinfo_monitor/cli.py --file data/almalinux.yml'`
