@@ -22,6 +22,7 @@ class Repository(Base):
     check_ts: Mapped[datetime] = mapped_column(DateTime, nullable=True)
     last_error: Mapped[str] = mapped_column(Text, nullable=True)
     check_result: Mapped[dict] = mapped_column(JSONB, nullable=True)
+    check_result_checksum: Mapped[str] = mapped_column(Text, nullable=True)
     updateinfo: Mapped[list["UpdateRecord"]] = relationship(
         back_populates="repository",
     )

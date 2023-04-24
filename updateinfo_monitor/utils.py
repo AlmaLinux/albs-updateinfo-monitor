@@ -10,8 +10,9 @@ from typing import Iterator
 import createrepo_c
 import requests
 import yaml
+from slack_sdk import WebClient
+from slack_sdk.errors import SlackApiError
 from sqlalchemy import select, update
-from sqlalchemy.orm import joinedload
 
 from updateinfo_monitor import models
 from updateinfo_monitor.config import settings
@@ -59,6 +60,7 @@ def update_repo_values(repo: Repository):
                 last_error=repo.last_error,
                 repomd_checksum=repo.repomd_checksum,
                 check_result=repo.check_result,
+                check_result_checksum=repo.check_result_checksum,
             )
         )
         session.commit()
@@ -100,6 +102,10 @@ def get_file_checksum(
             hasher.update(buff)
             buff = fd.read(buff_size)
     return hasher.hexdigest()
+
+
+def get_string_checksum(string: str) -> str:
+    return hashlib.sha256(string.encode()).hexdigest()
 
 
 def cleanup_repodata_dir(repodata_path: Path):
@@ -301,6 +307,42 @@ def index_repo(repo: Repository):
         repo_modules=repo_modules,
     )
     repo.repomd_checksum = cache_result.repomd_checksum
+
+
+def init_slack_client() -> WebClient:
+    return WebClient(
+        token=settings.slack_bot_token,
+    )
+
+
+def send_notification(repo: Repository, slack_client: WebClient):
+    if not repo.check_result or not settings.slack_notifications_enabled:
+        logging.debug(
+            "Skip sending notification, check_result field is empty"
+            "or sending notifications is disabled",
+        )
+        return
+    formatted_content = pprint.pformat(repo.check_result)
+    check_result_checksum = get_string_checksum(formatted_content)
+    if check_result_checksum == repo.check_result_checksum:
+        logging.debug(
+            "Skip sending notification, check_result_checksum is not changed",
+        )
+        return
+    try:
+        result = slack_client.files_upload_v2(
+            channel=settings.slack_channel_id,
+            filename=f"{repo.full_name}_result.json",
+            initial_comment=f"Check results for *{repo.full_name}* repository",
+            content=formatted_content,
+        )
+        repo.check_result_checksum = check_result_checksum
+        logging.debug("SlackApi response:\n%s", result)
+    except SlackApiError:
+        logging.exception(
+            "Cannot post message to slack channel: %s",
+            settings.slack_channel_id,
+        )
 
 
 def load_repositories_from_file(filepath: Path):

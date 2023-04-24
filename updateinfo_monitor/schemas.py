@@ -23,6 +23,7 @@ class Repository(BaseModel):
     check_ts: datetime | None = None
     last_error: str | None = None
     check_result: dict | None = Field(default_factory=dict)
+    check_result_checksum: str | None = None
 
     class Config:
         orm_mode = True

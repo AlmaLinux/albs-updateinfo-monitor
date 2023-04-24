@@ -14,6 +14,9 @@ class Settings(BaseSettings):
     loop_sleep_time: int = LOOP_SLEEP_TIME
     repodata_cache_dir: Path = Path("/srv/repodata_cache_dir/")
     logging_level: str = "INFO"
+    slack_notifications_enabled: bool = False
+    slack_bot_token: str = ""
+    slack_channel_id: str = ""
 
 
 settings = Settings()
