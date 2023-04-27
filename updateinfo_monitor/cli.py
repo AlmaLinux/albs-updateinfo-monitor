@@ -19,14 +19,13 @@ def parse_args():
         action="store_true",
         help="Start monitoring loop",
         required=False,
-        default=False,
+        default=True,
     )
     parser.add_argument(
         "--file",
         help="Path to .yml file with repositories for load in DB",
         required=False,
         type=Path,
-        default=Path("/srv/example.yml"),
     )
     return parser.parse_args()
 
