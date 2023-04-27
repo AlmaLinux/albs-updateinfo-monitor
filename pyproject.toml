@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "albs-updateinfo-monitor"
+version = "0.1.0"
+description = "AlmaLinux OS updateinfo monitor"
+authors = ["Daniil Anfimov <anfimovdan@gmail.com>"]
+readme = "README.md"
+packages = [{include = "updateinfo_monitor"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pydantic = "^1.10.7"
+sqlalchemy = "^2.0.9"
+psycopg2-binary = "^2.9.6"
+alembic = "^1.10.3"
+requests = "^2.28.2"
+pyyaml = "^6.0"
+slack-sdk = "^3.21.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
